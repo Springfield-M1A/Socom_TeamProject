@@ -23,7 +23,7 @@ print('-----------------')
 # 3차 Response 테스트 (json -> DataFrame)
 print('3차 Response 테스트 (json -> DataFrame)')
 kospi_df = pd.DataFrame(data)
-kospi_df[['localTradedAt', 'closePrice', 'openPrice']]
+
 print(kospi_df)
 print('-----------------')
 print(kospi_df[['localTradedAt', 'closePrice', 'openPrice']])
@@ -32,15 +32,14 @@ print('-----------------')
 # 4차 함수화 테스트
 print('4차 함수화 테스트')
 def stock_crawler(market, pageSize, page):
-    for i in range(1, page+1):
-        url = f"https://m.stock.naver.com/api/index/{market}/price?pageSize={pageSize}&page={i}"
-        response = requests.get(url)
-        data = response.json()
-        market_df = pd.DataFrame(data)
-        return market_df[['localTradedAt', 'closePrice', 'openPrice']]
+    url = f"https://m.stock.naver.com/api/index/{market}/price?pageSize={pageSize}&page={page}"
+    response = requests.get(url)
+    data = response.json()
+    market_df = pd.DataFrame(data)
+    return market_df[['localTradedAt', 'closePrice', 'openPrice']]
 
 # 함수 입력 테스트
-print('함수 입력 테스트')
+print('함수 입력, 호출 (KOSPI, KOSDAQ)')
 while True:
     input_Market = input('Market: ')
     if input_Market == 'KOSPI' or input_Market == 'KOSDAQ':
