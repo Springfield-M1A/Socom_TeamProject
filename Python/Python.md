@@ -10,3 +10,7 @@
 - fluctuationsRatio : 등락률
 - openPrice : 시가
 - highPrice : 고가
+
+## 23.04.29.
+ - investing.com 사이트 웹크롤링 불가
+ - investing.com의 Cloudflare사용으로 'requests'라이브러리 사용불으
