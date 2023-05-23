@@ -6,15 +6,17 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
             padding: 20px;
         }
 
         .jumbotron {
-            background-image: url("https://images.unsplash.com/photo-1580927752452-89d86da3fa0a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80");
+            background-image: url("https://images.unsplash.com/photo-1560221328-12fe60f83ab8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1474&q=80");
             background-size: cover;
             color: #fff;
-            padding: 250px;
+            padding: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: start; /* 요소들을 위쪽으로 정렬 */
         }
 
         .btn-primary {
@@ -30,26 +32,22 @@
         .btn-primary:focus, .btn-primary.focus {
             box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
         }
+
+        .alert {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
 <div class="jumbotron">
     <h1 class="display-4">Requirements Installation</h1>
-    <p class="lead">프로젝트의 원활한 실행을 위해 아래 버튼으로 필요한 패키지를 설치하십시오.</p>
-    {% if installation_completed %}
-        <div class="alert alert-success" role="alert">
-            Requirements have been successfully installed!
+    <p class="lead">Click the button below to check and install the required packages:</p>
+    {% for requirement in requirements %}
+        <div class="alert {{ requirement.status_class }}" role="alert">
+            <strong>{{ requirement.name }}</strong> - {{ requirement.status_message }}
         </div>
-    {% elif installation_error %}
-        <div class="alert alert-danger" role="alert">
-            An error occurred during requirements installation.
-        </div>
-    {% else %}
-        <div class="alert alert-info" role="alert">
-            :)
-        </div>
-    {% endif %}
-    <a href="{% url 'requirements' %}" class="btn btn-primary btn-lg">Install Requirements</a>
+    {% endfor %}
+    <a href="{% url 'requirements' %}" class="btn btn-primary btn-lg">Check and Install Requirements</a>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
