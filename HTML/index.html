@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>주식 정보</title>
+  <title>Stock</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -9,27 +10,38 @@
       padding: 20px;
     }
     
-    h1 {
-      margin-bottom: 30px;
+    .jumbotron {
+      background-image: url("https://images.unsplash.com/photo-1560221328-12fe60f83ab8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1474&q=80");
+      background-size: cover;
+      color: #fff;
+      padding: 400px;
     }
     
-    .btn {
-      display: inline-block;
-      padding: 10px 20px;
-      margin: 10px;
-      font-size: 18px;
+    .btn-primary {
       background-color: #007bff;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 5px;
+      border-color: #007bff;
+    }
+    
+    .btn-primary:hover {
+      background-color: #0069d9;
+      border-color: #0062cc;
+    }
+    
+    .btn-primary:focus, .btn-primary.focus {
+      box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
     }
   </style>
 </head>
 <body>
-  <h1>주식 정보</h1>
+  <div class="jumbotron">
+    <h1 class="display-4">제목</h1>
+    <p class="lead">간단한 한 줄 설명</p>
+    <a href="/stock" class="btn btn-primary btn-lg">주식 정보</a>
+    <a href="/prediction" class="btn btn-primary btn-lg">주식 예측</a>
+    <a href="/beginner" class="btn btn-primary btn-lg">주식 입문</a>
+  </div>
   
-  <a href="/stock" class="btn">주식 정보</a>
-  <a href="/prediction" class="btn">주식 예측</a>
-  <a href="/beginner" class="btn">주식 입문</a>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
 </body>
 </html>
