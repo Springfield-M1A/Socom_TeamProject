@@ -170,5 +170,3 @@ cython_debug/
 *.iml
 out
 gen
-
-# End of https://www.toptal.com/developers/gitignore/api/django
