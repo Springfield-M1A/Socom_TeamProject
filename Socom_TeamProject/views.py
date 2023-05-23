@@ -1,4 +1,6 @@
+import os
 from django.shortcuts import render
+
 
 def index(request):
     return render(request, 'index.html')
@@ -11,9 +13,6 @@ def prediction(request):
 
 def beginner(request):
     return render(request, 'beginner.html')
-
-def requirements(request):
-    return render(request, 'requirements.html')
 
 def copyrights(request):
     return render(request, 'copyrights.html')
