@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Requirements 설치</title>
+  <title>Install Requirements</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -36,11 +36,11 @@
   <h1>Requirements 설치</h1>
   <div class="install-info">
     <p>이 프로젝트를 실행하려면 아래의 Requirements를 설치해야 합니다.</p>
-    <p>터미널에서 다음 명령을 실행하세요:</p>
+    <p>아래의 버튼이 보이지 않는다면, 터미널에서 다음 명령을 실행하세요:</p>
     <code>pip install -r requirements.txt</code>
   </div>
   
-  <a href="#" class="install-btn">설치하기</a>
+  <a href="#" class="install-btn">Install</a>
   
   <div class="result-message" id="result-message" style="display: none;"></div>
   
@@ -60,12 +60,7 @@
           resultMessage.textContent = 'Requirements 설치 중 오류가 발생하였습니다.';
           resultMessage.style.display = 'block';
         });
-        .catch(error => {
-          resultMessage.textContent = 'Requirements 설치 중 오류가 발생하였습니다.';
-          resultMessage.style.display = 'block';
-        });
     });
   </script>
 </body>
 </html>
-
