@@ -1,20 +1,33 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>주식 관련 질문 요청</title>
     <style>
-        boby {
+        body {
             background-color: black;
+            color: white;
         }
     </style>
 </head>
+
 <body>
     <div>
-        <textarea rows="5" cols="50"></textarea>
+        <textarea id="question" rows="5" cols="50"></textarea>
     </div>
     <div>
-        <button>색 추천 요청</button>>
+        <button onclick="submitQuestion()">질문 요청</button>
     </div>
+    <script>
+        function submitQuestion() {
+            var question = document.getElementById("question").value;
+            alert(question);
+        }
+    </script>
 </body>
+
 </html>
+
+<!-- 위 코드에 요청을 반영하여 수정하였습니다. 버튼을 클릭하면 submitQuestion() 함수가 실행되며, 입력받은 질문을 얼럿창으로 출력합니다. 코드에서 변경된 부분은 버튼의 onclick 속성과
+submitQuestion() 함수입니다. 얼럿창에 뜨는 내용이 잘못된 경우, 함수 내용을 수정하시면 됩니다. -->
