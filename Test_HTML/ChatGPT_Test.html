@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html>
-
+<!--
+    본 소스코드는 GPT API를 활용해보는 간단한 예시코드입니다
+   소스코드 상에서 'API-KEY' 부분에 API를 발급받아서 넣고 주석을 해제하면 GPT API에 요청할 수 있습니다
+   API의 발급은 다음 웹페이지에서 가능합니다
+   https://platform.openai.com/account/api-keys
+   API에 요청에 따른 비용이 과금될 수 있는점과 API키가 노출되지 않도록 유의해주세요.
+   프론트엔드 코드는 노출될 수 있으므로 API키를 프론트엔드 코드에 넣지 않도록 유의해주세요.
+-->
 <head>
     <meta charset="UTF-8">
     <title>주식 관련 질문 요청</title>
@@ -19,15 +26,29 @@
     <div>
         <button onclick="submitQuestion()">질문 요청</button>
     </div>
+    <div id="result"></div>
     <script>
-        function submitQuestion() {
-            var question = document.getElementById("question").value;
-            alert(question);
+         const chatGPT = async (messages, parameters = {}) => {
+            //const apikey = 'API-KEY';
+            if (messages[0].constructor === String) return await chatGPT([['user', messages[0]]]);
+            messages = messages.map(line => ({ role: line[0], content: line[1].trim() }))
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apikey}` },
+               body: JSON.stringify({ model: 'gpt-3.5-turbo', messages, ...parameters }),
+            });
+            const data = await response.json();
+            return data.choices[0].message.content.trim();
+         };
+        async function submitQuestion() {
+            const response = await chatGPT`주식 초보들에게 추천해줄 자료가 있을까?`
+            var questionText = document.getElementById("question").value;
+            var resultText = document.getElementById("result");
+            resultText.innerHTML = response;
         }
     </script>
 </body>
 
 </html>
 
-<!-- 위 코드에 요청을 반영하여 수정하였습니다. 버튼을 클릭하면 submitQuestion() 함수가 실행되며, 입력받은 질문을 얼럿창으로 출력합니다. 코드에서 변경된 부분은 버튼의 onclick 속성과
-submitQuestion() 함수입니다. 얼럿창에 뜨는 내용이 잘못된 경우, 함수 내용을 수정하시면 됩니다. -->
+<!-- 위 코드에 요청을 반영하여 수정하였습니다. 버튼을 클릭하면 submitQuestion() 함수가 실행되며, 입력받은 질문을 result div에 출력합니다. 코드에서 변경된 부분은 버튼의 onclick 속성, submitQuestion() 함수, result div입니다. -->
