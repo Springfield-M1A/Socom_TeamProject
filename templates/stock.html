@@ -1,137 +1,32 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Stock</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-
-        .chart-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-
-        .chart {
-            width: 300px;
-            height: 200px;
-            margin: 10px;
-            border: 1px solid #ddd;
-            padding: 10px;
-        }
-
-        .graph-container {
-            margin-top: 30px;
-        }
-
-        .graph-select {
-            margin-bottom: 10px;
-        }
-
-        .graph {
-            width: 100%;
-            height: 400px;
-        }
-    </style>
+    <title>Stock Data</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 </head>
 <body>
 <div class="container">
-    <h1>Stock Information</h1>
-
-    <div class="chart-container">
-        <!-- 상위 차트 몇 개를 반복하여 보여줌 -->
-        {% for chart_data in top_charts %}
-            <div class="chart">
-                <h4>{{ chart_data.title }}</h4>
-                <!-- 차트 데이터를 표시 -->
-                <p>{{ chart_data.data }}</p>
-            </div>
-        {% endfor %}
-    </div>
-
-    <div class="graph-container">
-        <h3>Price History Graph</h3>
-
-        <!-- 기간 선택을 위한 버튼 -->
-        <div class="graph-select">
-            <button class="btn btn-primary" id="btn-day">1 Day</button>
-            <button class="btn btn-primary" id="btn-week">1 Week</button>
-            <button class="btn btn-primary" id="btn-month">1 Month</button>
-            <button class="btn btn-primary" id="btn-3months">3 Months</button>
-            <button class="btn btn-primary" id="btn-year">1 Year</button>
-            <button class="btn btn-primary" id="btn-5years">5 Years</button>
-            <button class="btn btn-primary" id="btn-all">All</button>
-        </div>
-
-        <!-- 선택한 종목의 그래프 -->
-        <canvas id="stock-graph" class="graph"></canvas>
-    </div>
+    <!-- 검색 창 -->
+    <input type="text" id="search-input" placeholder="Search...">
+    <button id="search-button">Search</button>
+    <!-- 종목 목록 -->
+    <div id="stock-list"></div>
+    <!-- 그래프 -->
+    <canvas id="myChart"></canvas>
+    <!-- 정규화 버튼 -->
+    <button id="normalize">정규화</button>
+    <!-- 시간 간격 선택 버튼 -->
+    <button class="interval" value="1day">1일</button>
+    <button class="interval" value="3days">3일</button>
+    <button class="interval" value="1week">1주</button>
+    <button class="interval" value="1month">1달</button>
+    <button class="interval" value="3months">3달</button>
+    <button class="interval" value="1year">1년</button>
+    <button class="interval" value="all">전체</button>
 </div>
-
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    let chart;
-    $('#btn-day').click(function() {
-        getStockData('AAPL', 'day');
-    });
-
-    $('#btn-month').click(function() {
-        getStockData('AAPL', 'month');
-    });
-
-    function getStockData(symbol, interval) {
-        $.ajax({
-            url: '/api/stock/',
-            data: {
-                symbol: symbol,
-                interval: interval
-            },
-            success: function(data) {
-                let stockData = data['Time Series (Daily)'];
-                let labels = Object.keys(stockData).reverse();
-                let prices = labels.map(label => stockData[label]['4. close']);
-
-                drawChart(labels, prices);
-            }
-        });
-    }
-
-    function drawChart(labels, data) {
-        if (chart) {
-            chart.destroy();
-        }
-
-        let ctx = document.getElementById('stock-graph').getContext('2d');
-        chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Stock Price',
-                    data: data,
-                    backgroundColor: 'rgba(0, 123, 255, 0.5)',
-                    borderColor: 'rgba(0, 123, 255, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    xAxes: [{
-                        type: 'time',
-                        distribution: 'linear'
-                    }]
-                }
-            }
-        });
-    }
-</script>
+<script src="{% static 'js/stock.js' %}"></script>
 </body>
 </html>
