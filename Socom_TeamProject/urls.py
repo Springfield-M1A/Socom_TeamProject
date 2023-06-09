@@ -9,5 +9,5 @@ urlpatterns = [
     path('prediction.html', prediction, name='prediction'),
     path('beginner.html', beginner, name='beginner'),
     path('copyrights.html', copyrights, name='copyrights'),
-    path('', views.stock_prediction, name='stock_prediction'),
+    path('', views.prediction, name='stock_prediction'),
 ]

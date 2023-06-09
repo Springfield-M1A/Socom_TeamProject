@@ -36,11 +36,11 @@ def stock_prediction(request):
     if request.method == 'POST':
         form = StockPredictionForm(request.POST)
         if form.is_valid():
-            stock_name = form.cleaned_data['stock_name']
-            page_size = form.cleaned_data['page_size']
+            market = form.cleaned_data['market']
+            pageSize = form.cleaned_data['pageSize']
             stock_data = []
             for page in range(0, 11):
-                data = stock_crawler(stock_name, page_size, page)
+                data = stock_crawler(market, pageSize, page)
                 stock_data.extend(data)
 
             return render(request, 'prediction.html', {'form': form, 'stock_data': stock_data})

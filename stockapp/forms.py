@@ -1,5 +1,5 @@
 from django import forms
 
 class StockPredictionForm(forms.Form):
-    stock_name = forms.CharField(label='종목명', max_length=100)
-    page_size = forms.IntegerField(label='페이지 사이즈')
+    market = forms.CharField(label='market', max_length=10)
+    pageSize = forms.IntegerField(label='pageSize')
