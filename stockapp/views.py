@@ -17,6 +17,15 @@ def stock_crawler(market):
     market_df = market_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
     return market_df
 
+def stock_crawler2(code):
+    url = f"https://finance.naver.com/item/sise.naver?code={code}"
+    requests = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'})
+    html=BeautifulSoup(requests.text, 'lxml')
+    code_df = pd.concat([df, pd.read_html(requests.text, encoding='euc-kr')[0]], ignore_index=True)
+
+    code_df.dropna(inplace=True)
+    code_df.reset_index(drop=True, inplace=True)
+
 def stock_graph(market):
     market_df = stock_crawler(market)
     market_price = market_df['closePrice']
@@ -62,13 +71,14 @@ def prediction(request):
                 <option value="KOSDAQ">KOSDAQ</option>
             </select>
             
+            <input type="text" name="code" placeholder="종목코드">
             <input type="submit" value="조회">
         </form>
         </div>
         
         <div class="graph" style="width:400px height:300px">
         <img src="../static/images/graph.png" alt="그래프">
-        </div>
+    </div>
 
     """
 
