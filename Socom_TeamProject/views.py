@@ -2,21 +2,19 @@ import os
 from django.shortcuts import render
 from django.http import JsonResponse
 import requests
-# Create your views here.
 
-ALPHA_VANTAGE_API_KEY = 'QM7BI9O6YE2M3M6M'
+
+from stockapp.models import Stock
 
 def stock(request):
-    stocks = Stock.objects.all()
-    return render(request, 'stock.html', {'stocks': stocks})
+    # 상위 5개 종목 정보 가져오기
+    top_stocks = Stock.objects.all()[:5]
 
-def get_stock_data(request):
-    symbol = request.GET.get('symbol', 'AAPL')
-    interval = request.GET.get('interval', 'daily')
-    base_url = 'https://www.alphavantage.co/query?'
-    function = 'TIME_SERIES_DAILY' if interval == 'day' else 'TIME_SERIES_MONTHLY'
-    data = requests.get(f'{base_url}function={function}&symbol={symbol}&apikey={ALPHA_VANTAGE_API_KEY}').json()
-    return JsonResponse(data)
+    context = {
+        'top_stocks': top_stocks
+    }
+
+    return render(request, 'stock.html', context)
 def index(request):
     return render(request, 'index.html')
 
