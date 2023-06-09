@@ -1,119 +1,84 @@
-{% load static %}
 <!DOCTYPE html>
-<html lang="ko">
+
 <head>
-    <title>Stock Information</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            text-align: center;
-            padding: 20px;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css">
 
-        .jumbotron {
-            background-image: url("https://images.unsplash.com/photo-1560221328-12fe60f83ab8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1474&q=80");
-            background-size: cover;
-            color: #fff;
-            padding: 250px 0;
-            margin-bottom: -20px;
-        }
-
-        .banner {
-            background-color: #f8f9fa;
-            padding: 10px;
-            font-size: 14px;
-            color: #777;
-        }
-
-        .banner a {
-            color: #333;
-            text-decoration: none;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-
-        .btn-container {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 30px;
-        }
-
-        .btn-primary {
-            padding: 80px;
-            font-size: 40px;
-            background-color: rgba(0,123,255,0);
-            color: rgba(255,255,255,0.4);
-            border: none;
-            transition: background-color 0.4s ease, color 0.01s ease;
-        }
-
-        .btn-primary:nth-child(1) {
-            background-color: rgba(40,167,69,0);
-        }
-
-        .btn-primary:nth-child(2) {
-            background-color: rgba(220,53,69,0);
-        }
-
-        .btn-primary:nth-child(3) {
-            background-color: rgba(0,123,255,0);
-        }
-
-        .btn-primary:hover {
-            background-color: rgba(0,0,0,0.3);
-            color: rgba(255,255,255,0.6);
-        }
-
-    </style>
 </head>
+
 <body>
-<!-- 종목 배너 -->
-<div id="banner">
-    {% for symbol in symbols %}
-        <div id="{{ symbol }}-banner"></div>
-    {% endfor %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1>Stock</h1>
+            </div>
+        </div>
+    <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+            {
+                "symbols": [
+                {
+                    "proName": "FOREXCOM:SPXUSD",
+                    "title": "S&P 500"
+                },
+                {
+                    "proName": "FOREXCOM:NSXUSD",
+                    "title": "US 100"
+                },
+                {
+                    "proName": "FX_IDC:EURUSD",
+                    "title": "EUR/USD"
+                },
+                {
+                    "proName": "BITSTAMP:BTCUSD",
+                    "title": "비트코인"
+                },
+                {
+                    "proName": "BITSTAMP:ETHUSD",
+                    "title": "이더리움"
+                }
+            ],
+                "showSymbolLogo": true,
+                "colorTheme": "light",
+                "isTransparent": false,
+                "displayMode": "adaptive",
+                "locale": "kr"
+            }
+        </script>
+    </div>
+    <!-- TradingView Widget END -->
+
+
+<!-- TradingView Widget BEGIN -->
+<div class="tradingview-widget-container">
+    <div id="tradingview_7de2e"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script type="text/javascript">
+        new TradingView.widget(
+            {
+                "width": 1000,
+                "height": 610,
+                "symbol": "NASDAQ:AAPL",
+                "interval": "D",
+                "timezone": "Etc/UTC",
+                "theme": "light",
+                "style": "1",
+                "locale": "kr",
+                "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false,
+                "allow_symbol_change": true,
+                "container_id": "tradingview_7de2e"
+            }
+        );
+    </script>
 </div>
 
-<!-- 그래프 설정 -->
-<div id="chart-settings">
-    {% for symbol in symbols %}
-        <label>
-            <input type="checkbox" name="symbol" value="{{ symbol }}">
-            {{ symbol }}
-        </label>
-    {% endfor %}
-    <button id="toggle-normalization">Normalize</button>
-    <button id="toggle-chart-type">Toggle Chart Type</button>
-</div>
 
-<!-- 주식 그래프 -->
-<canvas id="stock-chart"></canvas>
-
-<!-- 종목 정보 표 -->
-<input type="text" id="search-input" placeholder="Search">
-<table id="stock-table">
-    <!-- Table Headers -->
-    <tr>
-        <th>Symbol</th>
-        <th>Current Price</th>
-        <th>Low</th>
-        <th>High</th>
-    </tr>
-    <!-- Table Data -->
-    <!-- 여기서는 Django를 사용해 동적으로 행을 생성합니다. -->
-    {% for stock in stocks %}
-        <tr>
-            <td>{{ stock.symbol }}</td>
-            <td>{{ stock.current_price }}</td>
-            <td>{{ stock.low }}</td>
-            <td>{{ stock.high }}</td>
-        </tr>
-    {% endfor %}
-</table>
-
-<script src="{% static 'js/stock.js' %}"></script>
+<!-- TradingView Widget END -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
