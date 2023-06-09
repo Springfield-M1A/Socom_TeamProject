@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 from django.shortcuts import render, HttpResponse
 import pandas as pd
 import requests
@@ -11,7 +12,8 @@ def stock_crawler(market, pageSize, page):
     response = requests.get(url)
     data = response.json()
     market_df = pd.DataFrame(data)
-    return market_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
+    market_df = market_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
+    return market_df
 
 def prediction(request):
     market = 'KOSPI'
@@ -28,10 +30,14 @@ def prediction(request):
     else:
         result = f"market='{market}', pageSize='{pageSize}', page='{page}'"
 
-    # 여기에 그래프, 표 넣기
+    # 여기에 그래프, 표, 예측 넣기
+    graph = stock_graph(market, pageSize, page)
+    graph_path = 'graph.png'
+
+
 
     html_response = f"""
-        <p>{result}</p>
+        <p>{result}</p> <!-- 나중에 삭제 -->
         
         <a href="https://www.ktb.co.kr/trading/popup/itemPop.jspx" target="_blank"><img src="../static/images/Code.png" alt="코드 종목 조회"></a>
         <p></p>
@@ -46,7 +52,25 @@ def prediction(request):
             </select>
             <input type="submit" value="조회">
         </form>
-
+    
+        <img src="{graph_path}" alt="주식 그래프">
     """
 
     return HttpResponse(html_response)
+
+
+def stock_graph(market, pageSize, page):
+    market_df = stock_crawler(market, pageSize, page)
+    market_price = market_df['closePrice']
+
+    market_price = market_price.str.replace(',', '').astype(float)
+    plt.figure(figsize=(20, 10))
+
+    x_market = market_df['localTradedAt']
+    y_market = market_price.to_list()
+
+    plt.plot(x_market, y_market, label=market)
+    plt.legend(loc=0)
+    plt.savefig(graph_path)
+
+    return graph_path
