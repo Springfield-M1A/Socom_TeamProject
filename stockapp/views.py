@@ -4,26 +4,21 @@ import pandas as pd
 import requests
 import os
 
-market='KOSPI'
-
-
-
-def stock_crawler(market):
+def kospi_crawler():
     url = f"https://m.stock.naver.com/api/index/{market}/price?pageSize=50&page=1"
     response = requests.get(url)
     data = response.json()
-    market_df = pd.DataFrame(data)
-    market_df = market_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
-    return market_df
+    kospi_df = pd.DataFrame(data)
+    kospi_df = kospi_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
+    return kospi_df
 
-def stock_crawler2(code):
-    url = f"https://finance.naver.com/item/sise.naver?code={code}"
-    requests = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'})
-    html=BeautifulSoup(requests.text, 'lxml')
-    code_df = pd.concat([df, pd.read_html(requests.text, encoding='euc-kr')[0]], ignore_index=True)
-
-    code_df.dropna(inplace=True)
-    code_df.reset_index(drop=True, inplace=True)
+def kosdaq_crawler():
+    url = f"https://m.stock.naver.com/api/index/{market}/price?pageSize=50&page=1"
+    response = requests.get(url)
+    data = response.json()
+    kosdaq_df = pd.DataFrame(data)
+    kosdaq_df = kosdaq_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
+    return kosdaq_df
 
 def stock_graph(market):
     market_df = stock_crawler(market)
