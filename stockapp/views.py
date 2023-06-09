@@ -5,7 +5,7 @@ import requests
 
 market='KOSPI'
 pageSize=10
-page=0
+page=1
 
 def stock_crawler(market, pageSize, page):
     url = f"https://m.stock.naver.com/api/index/{market}/price?pageSize={pageSize}&page={page}"
@@ -15,10 +15,25 @@ def stock_crawler(market, pageSize, page):
     market_df = market_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
     return market_df
 
+def stock_graph(market, pageSize, page):
+    market_df = stock_crawler(market, pageSize, page)
+    market_price = market_df['closePrice']
+
+    market_price = market_price.str.replace(',', '').astype(float)
+    plt.figure(figsize=(20, 10))
+
+    x_market = market_df['localTradedAt']
+    y_market = market_price.to_list()
+
+    plt.plot(x_market, y_market, label=market)
+    plt.legend(loc=0)
+    plt.savefig('graph.png')
+
+
 def prediction(request):
     market = 'KOSPI'
     pageSize = 10
-    page = 0
+    page = 1
 
     if request.GET:
         market = request.GET.get('market', market)
@@ -27,12 +42,14 @@ def prediction(request):
 
     if not request.GET:
         result = "market='KOSPI', pageSize='10', page='0'"
+        graph=stock_graph(market, pageSize, page)
     else:
         result = f"market='{market}', pageSize='{pageSize}', page='{page}'"
+        graph=stock_graph(market, pageSize, page)
 
     # 여기에 그래프, 표, 예측 넣기
-    graph = stock_graph(market, pageSize, page)
-    graph_path = 'graph.png'
+    graphpath = 'graph.png'
+
 
 
 
@@ -52,25 +69,11 @@ def prediction(request):
             </select>
             <input type="submit" value="조회">
         </form>
-    
-        <img src="{graph_path}" alt="주식 그래프">
+        <img src="{graphpath}" alt="그래프">
+
+
     """
 
     return HttpResponse(html_response)
 
 
-def stock_graph(market, pageSize, page):
-    market_df = stock_crawler(market, pageSize, page)
-    market_price = market_df['closePrice']
-
-    market_price = market_price.str.replace(',', '').astype(float)
-    plt.figure(figsize=(20, 10))
-
-    x_market = market_df['localTradedAt']
-    y_market = market_price.to_list()
-
-    plt.plot(x_market, y_market, label=market)
-    plt.legend(loc=0)
-    plt.savefig(graph_path)
-
-    return graph_path
