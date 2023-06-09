@@ -2,11 +2,16 @@ import os
 from django.shortcuts import render
 from django.http import JsonResponse
 import requests
-
 # Create your views here.
 
 ALPHA_VANTAGE_API_KEY = 'QM7BI9O6YE2M3M6M'
 
+def stock(request):
+    # 주식 정보 가져오기
+    stocks = Stock.objects.all()  # Stock 모델의 모든 주식 정보를 가져옴
+
+    # 필요한 데이터를 컨텍스트로 전달하여 stock.html 렌더링
+    return render(request, 'stock.html', {'stocks': stocks})
 def stock_view(request):
     return render(request, 'stock.html')
 

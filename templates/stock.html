@@ -1,32 +1,51 @@
-{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Stock Data</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <title>Stock</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* 스타일 작성 */
+    </style>
 </head>
 <body>
 <div class="container">
-    <!-- 검색 창 -->
-    <input type="text" id="search-input" placeholder="Search...">
-    <button id="search-button">Search</button>
-    <!-- 종목 목록 -->
-    <div id="stock-list"></div>
-    <!-- 그래프 -->
-    <canvas id="myChart"></canvas>
-    <!-- 정규화 버튼 -->
-    <button id="normalize">정규화</button>
-    <!-- 시간 간격 선택 버튼 -->
-    <button class="interval" value="1day">1일</button>
-    <button class="interval" value="3days">3일</button>
-    <button class="interval" value="1week">1주</button>
-    <button class="interval" value="1month">1달</button>
-    <button class="interval" value="3months">3달</button>
-    <button class="interval" value="1year">1년</button>
-    <button class="interval" value="all">전체</button>
+    <h1>Stock Information</h1>
+
+    <!-- 배너 -->
+    <div class="banner">
+        <!-- 종목 정보 출력 -->
+    </div>
+
+    <!-- 시간/가격 그래프 -->
+    <div class="graph">
+        <!-- 그래프 영역 -->
+    </div>
+
+    <!-- 그래프 옵션 버튼 -->
+    <div class="graph-options">
+        <button class="btn btn-primary" onclick="changeChartType('line')">Line Chart</button>
+        <button class="btn btn-primary" onclick="changeChartType('candle')">Candlestick Chart</button>
+    </div>
+
+    <!-- 종목 표 -->
+    <table class="stock-table">
+        <thead>
+        <tr>
+            <th>종목코드</th>
+            <th>종목명</th>
+            <th>현재가</th>
+            <th>저가</th>
+            <th>고가</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 종목 정보 출력 -->
+        </tbody>
+    </table>
 </div>
-<script src="{% static 'js/stock.js' %}"></script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+<script src="stock.js"></script>
 </body>
 </html>

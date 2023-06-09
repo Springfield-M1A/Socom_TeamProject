@@ -1,78 +1,140 @@
-$(document).ready(function() {
-    let myChart;
-    let stocks = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'FB']; // 상위 종목들
+// 종목 정보 데이터
+const stockData = [
+    { code: "AAPL", name: "Apple Inc.", price: 150.50, low: 148.80, high: 152.20 },
+    { code: "GOOGL", name: "Alphabet Inc.", price: 2500.00, low: 2475.50, high: 2530.00 },
+    // ... 추가 종목 데이터
+];
 
-    // 첫 번째 종목을 그래프로 보여줍니다.
-    getStockData(stocks[0]);
+// 상위 차트 데이터
+const topChart1 = { title: "Chart 1", data: "..." };
+const topChart2 = { title: "Chart 2", data: "..." };
+const topChart3 = { title: "Chart 3", data: "..." };
+const topChart4 = { title: "Chart 4", data: "..." };
+const topChart5 = { title: "Chart 5", data: "..." };
+const topCharts = [topChart1, topChart2, topChart3, topChart4, topChart5];
 
-    // 종목 리스트를 만듭니다.
-    for (let stock of stocks) {
-        $("#stock-list").append(`<button class="stock-button" value="${stock}">${stock}</button>`);
-    }
+// 초기화 함수
+function init() {
+    displayTopCharts();
+    displayStockTable();
+}
 
-    // 종목 버튼을 클릭했을 때, 해당 종목의 그래프를 보여줍니다.
-    $(".stock-button").click(function() {
-        let stock = $(this).val();
-        getStockData(stock);
+// 상위 차트 표시
+function displayTopCharts() {
+    const chartContainer = document.querySelector(".top-charts");
+
+    // 상위 차트 데이터를 반복하여 표시
+    topCharts.forEach((chartData) => {
+        const chartDiv = document.createElement("div");
+        chartDiv.classList.add("chart");
+
+        const title = document.createElement("h4");
+        title.textContent = chartData.title;
+        chartDiv.appendChild(title);
+
+        const data = document.createElement("p");
+        data.textContent = chartData.data;
+        chartDiv.appendChild(data);
+
+        chartContainer.appendChild(chartDiv);
     });
+}
 
-    // 검색 버튼을 클릭했을 때, 검색한 종목의 그래프를 보여줍니다.
-    $("#search-button").click(function() {
-        let stock = $("#search-input").val();
-        getStockData(stock);
+// 종목 표 표시
+function displayStockTable() {
+    const tableBody = document.querySelector(".stock-table tbody");
+
+    // 종목 데이터를 반복하여 표시
+    stockData.forEach((stock) => {
+        const row = document.createElement("tr");
+
+        const codeCell = document.createElement("td");
+        codeCell.textContent = stock.code;
+        row.appendChild(codeCell);
+
+        const nameCell = document.createElement("td");
+        nameCell.textContent = stock.name;
+        row.appendChild(nameCell);
+
+        const priceCell = document.createElement("td");
+        priceCell.textContent = stock.price;
+        row.appendChild(priceCell);
+
+        const lowCell = document.createElement("td");
+        lowCell.textContent = stock.low;
+        row.appendChild(lowCell);
+
+        const highCell = document.createElement("td");
+        highCell.textContent = stock.high;
+        row.appendChild(highCell);
+
+        tableBody.appendChild(row);
     });
+}
 
-    // 시간 간격 버튼을 클릭했을 때, 해당 시간 간격으로 그래프를 업데이트합니다.
-    $(".interval").click(function() {
-        let interval = $(this).val();
-        updateChart(interval);
-    });
+// 그래프 종류 변경
+function changeChartType(type) {
+    // TODO: 그래프 종류 변경 로직 구현
+}
 
-    // 정규화 버튼을 클릭했을 때, 그래프를 정규화합니다.
-    $("#normalize").click(function() {
-        // 정규화 로직을 추가합니다.
-    });
+// 데이터 가져오기
+function fetchData() {
+    // API 호출 및 데이터 처리 로직 구현
+}
 
-    // 주식 데이터를 가져와 그래프를 그립니다.
-    function getStockData(stock) {
-        $.ajax({
-            url: '/get_stock_data/',
-            data: {
-                'symbol': stock,
-                'interval': 'daily'
-            },
-            dataType: 'json',
-            success: function(data) {
-                let dates = Object.keys(data['Time Series (Daily)']).reverse();
-                let prices = dates.map(date => data['Time Series (Daily)'][date]['4. close']);
-                drawChart(stock, dates, prices);
-            }
-        });
-    }
+// 그래프 그리기
+function drawGraph() {
+    // 그래프 그리기 로직 구현 (D3.js, Chart.js 등 활용)
+}
 
-    // 그래프를 그립니다.
-    function drawChart(stock, dates, prices) {
-        if (myChart) {
-            myChart.destroy(); // 이전 그래프를 제거합니다.
+// 종목 표 업데이트
+function updateStockTable() {
+    const tableBody = document.querySelector(".stock-table tbody");
+
+    // 검색어 가져오기
+    const searchKeyword = document.querySelector("#search-input").value.toLowerCase();
+
+    // 종목 표 초기화
+    tableBody.innerHTML = "";
+
+    // 종목 데이터 반복하여 표시
+    stockData.forEach((stock) => {
+        // 종목명과 검색어 비교
+        if (stock.name.toLowerCase().includes(searchKeyword)) {
+            const row = document.createElement("tr");
+
+            const codeCell = document.createElement("td");
+            codeCell.textContent = stock.code;
+            row.appendChild(codeCell);
+
+            const nameCell = document.createElement("td");
+            nameCell.textContent = stock.name;
+            row.appendChild(nameCell);
+
+            const priceCell = document.createElement("td");
+            priceCell.textContent = stock.price;
+            row.appendChild(priceCell);
+
+            const lowCell = document.createElement("td");
+            lowCell.textContent = stock.low;
+            row.appendChild(lowCell);
+
+            const highCell = document.createElement("td");
+            highCell.textContent = stock.high;
+            row.appendChild(highCell);
+
+            tableBody.appendChild(row);
         }
-        let ctx = document.getElementById('myChart').getContext('2d');
-        myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: dates,
-                datasets: [{
-                    label: stock,
-                    data: prices,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            }
-        });
-    }
+    });
+}
 
-    // 그래프를 업데이트합니다.
-    function updateChart(interval) {
-        // 시간 간격에 따른 그래프 업데이트 로직을 추가합니다.
-    }
-});
+// 이벤트 리스너 등록
+document.querySelector("#search-input").addEventListener("input", updateStockTable);
+
+// 초기화 실행
+fetchData();
+drawGraph();
+updateStockTable();
+
+// 초기화 실행
+init();
