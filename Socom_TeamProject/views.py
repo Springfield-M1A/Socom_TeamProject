@@ -12,7 +12,7 @@ def stock(request):
     return render(request, 'stock.html')
 
 def prediction(request):
-    return render(request, 'prediction.html')
+    return render(request, 'stockapp.url')
 
 def beginner(request):
     return render(request, 'beginner.html')
