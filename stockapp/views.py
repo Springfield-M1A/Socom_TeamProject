@@ -9,8 +9,7 @@ market='KOSPI'
 
 
 def stock_crawler(market):
-    for page in range(1, 11):
-        url = f"https://m.stock.naver.com/api/index/{market}/price?pageSize=50&page=1"
+    url = f"https://m.stock.naver.com/api/index/{market}/price?pageSize=50&page=1"
     response = requests.get(url)
     data = response.json()
     market_df = pd.DataFrame(data)
