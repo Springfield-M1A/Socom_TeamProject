@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from django.shortcuts import render, HttpResponse
 import pandas as pd
 import requests
+import os
 
 market='KOSPI'
 pageSize=10
@@ -23,11 +24,18 @@ def stock_graph(market, pageSize, page):
     plt.figure(figsize=(20, 10))
 
     x_market = market_df['localTradedAt']
+    x_market = x_market[::-1]
     y_market = market_price.to_list()
 
     plt.plot(x_market, y_market, label=market)
     plt.legend(loc=0)
-    plt.savefig('graph.png')
+
+    static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
+    image_path = os.path.join(static_dir, 'images', 'graph.png')
+
+    plt.savefig(image_path)
+
+
 
 
 def prediction(request):
@@ -42,18 +50,15 @@ def prediction(request):
 
     if not request.GET:
         result = "market='KOSPI', pageSize='10', page='0'"
-        graph=stock_graph(market, pageSize, page)
     else:
         result = f"market='{market}', pageSize='{pageSize}', page='{page}'"
-        graph=stock_graph(market, pageSize, page)
 
     # 여기에 그래프, 표, 예측 넣기
-    graphpath = 'graph.png'
-
-
+    graph=stock_graph(market, pageSize, page)
 
 
     html_response = f"""
+    <div class="container">
         <p>{result}</p> <!-- 나중에 삭제 -->
         
         <a href="https://www.ktb.co.kr/trading/popup/itemPop.jspx" target="_blank"><img src="../static/images/Code.png" alt="코드 종목 조회"></a>
@@ -64,13 +69,15 @@ def prediction(request):
                 <option value="5">30</option>
                 <option value="10">60</option>
                 <option value="20">120</option>
-                <option value="30">180</option>
                 <option value="40">240</option>
             </select>
             <input type="submit" value="조회">
         </form>
-        <img src="{graphpath}" alt="그래프">
-
+        </div>
+        
+        <div class="graph" style="width:400px height:300px">
+        <img src="../static/images/graph.png" alt="그래프">
+        </div>
 
     """
 
