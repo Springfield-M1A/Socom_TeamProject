@@ -1,54 +1,84 @@
-{% load static %}
 <!DOCTYPE html>
-<html>
+
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        /* 스타일 추가 */
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css">
 
-    </style>
 </head>
+
 <body>
-<!-- 상위 5개 종목 배너 -->
-<div class="banner">
-    <!-- 종목 정보 출력 -->
-    <div class="stock-info">
-        <!-- 종목 정보를 표시하는 요소들 -->
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1>Stock</h1>
+            </div>
+        </div>
+    <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+            {
+                "symbols": [
+                {
+                    "proName": "FOREXCOM:SPXUSD",
+                    "title": "S&P 500"
+                },
+                {
+                    "proName": "FOREXCOM:NSXUSD",
+                    "title": "US 100"
+                },
+                {
+                    "proName": "FX_IDC:EURUSD",
+                    "title": "EUR/USD"
+                },
+                {
+                    "proName": "BITSTAMP:BTCUSD",
+                    "title": "비트코인"
+                },
+                {
+                    "proName": "BITSTAMP:ETHUSD",
+                    "title": "이더리움"
+                }
+            ],
+                "showSymbolLogo": true,
+                "colorTheme": "light",
+                "isTransparent": false,
+                "displayMode": "adaptive",
+                "locale": "kr"
+            }
+        </script>
     </div>
+    <!-- TradingView Widget END -->
+
+
+<!-- TradingView Widget BEGIN -->
+<div class="tradingview-widget-container">
+    <div id="tradingview_7de2e"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script type="text/javascript">
+        new TradingView.widget(
+            {
+                "width": 1000,
+                "height": 610,
+                "symbol": "NASDAQ:AAPL",
+                "interval": "D",
+                "timezone": "Etc/UTC",
+                "theme": "light",
+                "style": "1",
+                "locale": "kr",
+                "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false,
+                "allow_symbol_change": true,
+                "container_id": "tradingview_7de2e"
+            }
+        );
+    </script>
 </div>
 
-<!-- 시간/가격 그래프 -->
-<div class="graph">
-    <!-- 그래프 출력 -->
-    <div class="graph-options">
-        <!-- 그래프 옵션 버튼 (평범한 그래프, 캔들 그래프) -->
-    </div>
-</div>
-
-<!-- 종목 목록 테이블 -->
-<div class="stock-table">
-    <!-- 검색 기능 -->
-    <input type="text" id="search-input" placeholder="종목 검색">
-    <table>
-        <thead>
-        <tr>
-            <th>구분</th>
-            <th>종목코드</th>
-            <th>종목명</th>
-            <th>현재가</th>
-            <th>저가</th>
-            <th>고가</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- 종목 정보 행들 -->
-        </tbody>
-    </table>
-</div>
-
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
-<script src="{% static 'js/stock.js' %}"></script>
+        
+<!-- TradingView Widget END -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
