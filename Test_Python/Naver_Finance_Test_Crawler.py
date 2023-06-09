@@ -2,17 +2,17 @@ from bs4 import BeautifulSoup
 import requests
 import pandas as pd
 
-code='005930'
-page=1
+url = "https://finance.naver.com/sise/sise_market_sum.nhn?page=1"
 
-url = f"https://finance.naver.com/item/sise.naver?code={code}&page={page}"
-response = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'})
-html = response.text
+res = requests.get(url)
+soup = BeautifulSoup(res.text, 'lxml')
 
-soup = BeautifulSoup(html, 'html.parser')
+print (soup)
 
-price = soup.select_one("#_nowVal").text
-print(price)
+stock_head = soup.find("thead").find_all("th")
+data_head = [head.get_text() for head in stock_head]
+
+print(data_head)
 
 for page in range(1, 11):
     url = f"https://finance.naver.com/item/sise.naver?code={code}&page={page}"
