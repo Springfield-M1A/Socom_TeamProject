@@ -1,51 +1,57 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-    <title>Stock</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        /* 스타일 작성 */
-    </style>
+    <title>Stock Information</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 추가로 필요한 스크립트나 CSS를 로드합니다 -->
 </head>
 <body>
-<div class="container">
-    <h1>Stock Information</h1>
-
-    <!-- 배너 -->
-    <div class="banner">
-        <!-- 종목 정보 출력 -->
-    </div>
-
-    <!-- 시간/가격 그래프 -->
-    <div class="graph">
-        <!-- 그래프 영역 -->
-    </div>
-
-    <!-- 그래프 옵션 버튼 -->
-    <div class="graph-options">
-        <button class="btn btn-primary" onclick="changeChartType('line')">Line Chart</button>
-        <button class="btn btn-primary" onclick="changeChartType('candle')">Candlestick Chart</button>
-    </div>
-
-    <!-- 종목 표 -->
-    <table class="stock-table">
-        <thead>
-        <tr>
-            <th>종목코드</th>
-            <th>종목명</th>
-            <th>현재가</th>
-            <th>저가</th>
-            <th>고가</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- 종목 정보 출력 -->
-        </tbody>
-    </table>
+<!-- 종목 배너 -->
+<div id="banner">
+    {% for symbol in symbols %}
+        <div id="{{ symbol }}-banner"></div>
+    {% endfor %}
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
-<script src="stock.js"></script>
+<!-- 그래프 설정 -->
+<div id="chart-settings">
+    {% for symbol in symbols %}
+        <label>
+            <input type="checkbox" name="symbol" value="{{ symbol }}">
+            {{ symbol }}
+        </label>
+    {% endfor %}
+    <button id="toggle-normalization">Normalize</button>
+    <button id="toggle-chart-type">Toggle Chart Type</button>
+</div>
+
+<!-- 주식 그래프 -->
+<canvas id="stock-chart"></canvas>
+
+<!-- 종목 정보 표 -->
+<input type="text" id="search-input" placeholder="Search">
+<table id="stock-table">
+    <!-- Table Headers -->
+    <tr>
+        <th>Symbol</th>
+        <th>Current Price</th>
+        <th>Low</th>
+        <th>High</th>
+    </tr>
+    <!-- Table Data -->
+    <!-- 여기서는 Django를 사용해 동적으로 행을 생성합니다. -->
+    {% for stock in stocks %}
+        <tr>
+            <td>{{ stock.symbol }}</td>
+            <td>{{ stock.current_price }}</td>
+            <td>{{ stock.low }}</td>
+            <td>{{ stock.high }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<script src="{% static 'js/stock.js' %}"></script>
 </body>
 </html>

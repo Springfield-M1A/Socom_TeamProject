@@ -1,140 +1,120 @@
-// 종목 정보 데이터
-const stockData = [
-    { code: "AAPL", name: "Apple Inc.", price: 150.50, low: 148.80, high: 152.20 },
-    { code: "GOOGL", name: "Alphabet Inc.", price: 2500.00, low: 2475.50, high: 2530.00 },
-    // ... 추가 종목 데이터
-];
+let symbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'FB'];
+let chart;
+let isNormalized = false;
+let chartType = 'line'; // 기본 차트 타입
 
-// 상위 차트 데이터
-const topChart1 = { title: "Chart 1", data: "..." };
-const topChart2 = { title: "Chart 2", data: "..." };
-const topChart3 = { title: "Chart 3", data: "..." };
-const topChart4 = { title: "Chart 4", data: "..." };
-const topChart5 = { title: "Chart 5", data: "..." };
-const topCharts = [topChart1, topChart2, topChart3, topChart4, topChart5];
+window.onload = function() {
+    symbols.forEach(symbol => {
+        getStockData(symbol, updateBanner);
+    });
 
-// 초기화 함수
-function init() {
-    displayTopCharts();
-    displayStockTable();
+    let ctx = document.getElementById('stock-chart').getContext('2d');
+    chart = new Chart(ctx, {
+        type: chartType,
+        data: {},
+        options: {} // 필요한 옵션을 설정합니다.
+    });
+
+    document.getElementById('toggle-normalization').addEventListener('click', toggleNormalization);
+    document.getElementById('toggle-chart-type').addEventListener('click', toggleChartType);
+
+    Array.from(document.getElementsByName('symbol')).forEach(checkbox => {
+        checkbox.addEventListener('change', updateChart);
+    });
+
+    document.getElementById('search-input').addEventListener('keyup', function() {
+        let input = this.value.toUpperCase();
+        let rows = document.getElementById('stock-table').getElementsByTagName('tr');
+        for (let i = 0; i < rows.length; i++) {
+            let cells = rows[i].getElementsByTagName('td');
+            let match = Array.from(cells).some(cell => cell.innerText.toUpperCase().includes(input));
+            rows[i].style.display = match ? '' : 'none';
+        }
+    });
+};
+
+function toggleNormalization() {
+    isNormalized = !isNormalized;
+    updateChart();
 }
 
-// 상위 차트 표시
-function displayTopCharts() {
-    const chartContainer = document.querySelector(".top-charts");
+function toggleChartType() {
+    chartType = chartType === 'line' ? 'candlestick' : 'line';
+    updateChart();
+}
 
-    // 상위 차트 데이터를 반복하여 표시
-    topCharts.forEach((chartData) => {
-        const chartDiv = document.createElement("div");
-        chartDiv.classList.add("chart");
+window.onload = function() {
+    symbols.forEach(symbol => {
+        getStockData(symbol, updateBanner); // 각 종목에 대해 정보를 가져옵니다.
+    });
+    // 다른 초기화 작업들...
+}
 
-        const title = document.createElement("h4");
-        title.textContent = chartData.title;
-        chartDiv.appendChild(title);
+function getStockData(symbol, callback) {
+    fetch(`/get_stock_data?symbol=${symbol}`)
+        .then(response => response.json())
+        .then(data => {
+            callback(symbol, data); // 가져온 데이터를 이용해 해당 종목의 배너를 업데이트합니다.
+        })
+        .catch(error => console.error('Error:', error));
+}
 
-        const data = document.createElement("p");
-        data.textContent = chartData.data;
-        chartDiv.appendChild(data);
+function updateBanner(symbol, data) {
+    // 가져온 데이터를 이용해 배너를 업데이트합니다.
+    // 이 부분은 실제 데이터의 형태에 따라 작성해야 합니다.
+}
 
-        chartContainer.appendChild(chartDiv);
+
+window.onload = function() {
+    // 차트를 초기화합니다.
+    let ctx = document.getElementById('stock-chart').getContext('2d');
+    chart = new Chart(ctx, {
+        type: 'line', // 기본 차트 타입
+        data: {},
+        options: {} // 필요한 옵션을 설정합니다.
+    });
+
+    symbols.forEach(symbol => {
+        getStockData(symbol, updateChart); // 각 종목에 대해 정보를 가져와 차트를 업데이트합니다.
     });
 }
 
-// 종목 표 표시
-function displayStockTable() {
-    const tableBody = document.querySelector(".stock-table tbody");
+function updateChart(symbol, data) {
+    // 가져온 데이터를 이용해 차트를 업데이트합니다.
+    // 이 부분은 실제 데이터의 형태에 따라 작성해야 합니다.
+}
+// static/js/stock.js
+window.onload = function() {
+    // 초기화 작업들...
 
-    // 종목 데이터를 반복하여 표시
-    stockData.forEach((stock) => {
-        const row = document.createElement("tr");
-
-        const codeCell = document.createElement("td");
-        codeCell.textContent = stock.code;
-        row.appendChild(codeCell);
-
-        const nameCell = document.createElement("td");
-        nameCell.textContent = stock.name;
-        row.appendChild(nameCell);
-
-        const priceCell = document.createElement("td");
-        priceCell.textContent = stock.price;
-        row.appendChild(priceCell);
-
-        const lowCell = document.createElement("td");
-        lowCell.textContent = stock.low;
-        row.appendChild(lowCell);
-
-        const highCell = document.createElement("td");
-        highCell.textContent = stock.high;
-        row.appendChild(highCell);
-
-        tableBody.appendChild(row);
+    document.getElementById('change-chart-type').addEventListener('click', function() {
+        // 차트 타입을 바꿉니다. 'line'과 'candlestick' 사이에서 바꿉니다.
+        chart.config.type = chart.config.type === 'line' ? 'candlestick' : 'line';
+        chart.update(); // 차트를 업데이트합니다.
     });
 }
+// static/js/stock.js
+window.onload = function() {
+    // 초기화 작업들...
 
-// 그래프 종류 변경
-function changeChartType(type) {
-    // TODO: 그래프 종류 변경 로직 구현
-}
-
-// 데이터 가져오기
-function fetchData() {
-    // API 호출 및 데이터 처리 로직 구현
-}
-
-// 그래프 그리기
-function drawGraph() {
-    // 그래프 그리기 로직 구현 (D3.js, Chart.js 등 활용)
-}
-
-// 종목 표 업데이트
-function updateStockTable() {
-    const tableBody = document.querySelector(".stock-table tbody");
-
-    // 검색어 가져오기
-    const searchKeyword = document.querySelector("#search-input").value.toLowerCase();
-
-    // 종목 표 초기화
-    tableBody.innerHTML = "";
-
-    // 종목 데이터 반복하여 표시
-    stockData.forEach((stock) => {
-        // 종목명과 검색어 비교
-        if (stock.name.toLowerCase().includes(searchKeyword)) {
-            const row = document.createElement("tr");
-
-            const codeCell = document.createElement("td");
-            codeCell.textContent = stock.code;
-            row.appendChild(codeCell);
-
-            const nameCell = document.createElement("td");
-            nameCell.textContent = stock.name;
-            row.appendChild(nameCell);
-
-            const priceCell = document.createElement("td");
-            priceCell.textContent = stock.price;
-            row.appendChild(priceCell);
-
-            const lowCell = document.createElement("td");
-            lowCell.textContent = stock.low;
-            row.appendChild(lowCell);
-
-            const highCell = document.createElement("td");
-            highCell.textContent = stock.high;
-            row.appendChild(highCell);
-
-            tableBody.appendChild(row);
+    document.getElementById('search-input').addEventListener('keyup', function() {
+        let input = this.value.toUpperCase(); // 검색어
+        let rows = document.getElementById('table').getElementsByTagName('tr');
+        for (let i = 0; i < rows.length; i++) {
+            let cells = rows[i].getElementsByTagName('td');
+            let match = Array.from(cells).some(cell => cell.innerText.toUpperCase().includes(input));
+            rows[i].style.display = match ? '' : 'none'; // 일치하는 행만 보여줍니다.
         }
     });
 }
-
-// 이벤트 리스너 등록
-document.querySelector("#search-input").addEventListener("input", updateStockTable);
-
-// 초기화 실행
-fetchData();
-drawGraph();
-updateStockTable();
-
-// 초기화 실행
-init();
+// stock.js
+let chart = new Chart(ctx, {
+    type: 'candlestick', // 새로운 차트 타입을 사용합니다.
+    data: {
+        datasets: [{
+            data: [], // 데이터는 [시작 가격, 종가, 최고가, 최저가]의 배열들을 포함하는 배열이어야 합니다.
+            // ...
+        }],
+    },
+    // ...
+});

@@ -3,7 +3,6 @@ from .views import index, stock, prediction, beginner, copyrights
 from stockapp import views
 from stockapp.views import get_stock_data
 from stockapp.views import stock_view
-from django.urls import path
 from . import views
 
 urlpatterns = [
