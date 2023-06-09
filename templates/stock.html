@@ -1,137 +1,119 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-    <title>Stock</title>
+    <title>Stock Information</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Noto Sans KR', sans-serif;
+            text-align: center;
             padding: 20px;
         }
 
-        .chart-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-bottom: 30px;
+        .jumbotron {
+            background-image: url("https://images.unsplash.com/photo-1560221328-12fe60f83ab8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1474&q=80");
+            background-size: cover;
+            color: #fff;
+            padding: 250px 0;
+            margin-bottom: -20px;
         }
 
-        .chart {
-            width: 300px;
-            height: 200px;
-            margin: 10px;
-            border: 1px solid #ddd;
+        .banner {
+            background-color: #f8f9fa;
             padding: 10px;
+            font-size: 14px;
+            color: #777;
         }
 
-        .graph-container {
+        .banner a {
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: space-around;
             margin-top: 30px;
         }
 
-        .graph-select {
-            margin-bottom: 10px;
+        .btn-primary {
+            padding: 80px;
+            font-size: 40px;
+            background-color: rgba(0,123,255,0);
+            color: rgba(255,255,255,0.4);
+            border: none;
+            transition: background-color 0.4s ease, color 0.01s ease;
         }
 
-        .graph {
-            width: 100%;
-            height: 400px;
+        .btn-primary:nth-child(1) {
+            background-color: rgba(40,167,69,0);
         }
+
+        .btn-primary:nth-child(2) {
+            background-color: rgba(220,53,69,0);
+        }
+
+        .btn-primary:nth-child(3) {
+            background-color: rgba(0,123,255,0);
+        }
+
+        .btn-primary:hover {
+            background-color: rgba(0,0,0,0.3);
+            color: rgba(255,255,255,0.6);
+        }
+
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>Stock Information</h1>
-
-    <div class="chart-container">
-        <!-- 상위 차트 몇 개를 반복하여 보여줌 -->
-        {% for chart_data in top_charts %}
-            <div class="chart">
-                <h4>{{ chart_data.title }}</h4>
-                <!-- 차트 데이터를 표시 -->
-                <p>{{ chart_data.data }}</p>
-            </div>
-        {% endfor %}
-    </div>
-
-    <div class="graph-container">
-        <h3>Price History Graph</h3>
-
-        <!-- 기간 선택을 위한 버튼 -->
-        <div class="graph-select">
-            <button class="btn btn-primary" id="btn-day">1 Day</button>
-            <button class="btn btn-primary" id="btn-week">1 Week</button>
-            <button class="btn btn-primary" id="btn-month">1 Month</button>
-            <button class="btn btn-primary" id="btn-3months">3 Months</button>
-            <button class="btn btn-primary" id="btn-year">1 Year</button>
-            <button class="btn btn-primary" id="btn-5years">5 Years</button>
-            <button class="btn btn-primary" id="btn-all">All</button>
-        </div>
-
-        <!-- 선택한 종목의 그래프 -->
-        <canvas id="stock-graph" class="graph"></canvas>
-    </div>
+<!-- 종목 배너 -->
+<div id="banner">
+    {% for symbol in symbols %}
+        <div id="{{ symbol }}-banner"></div>
+    {% endfor %}
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    let chart;
-    $('#btn-day').click(function() {
-        getStockData('AAPL', 'day');
-    });
+<!-- 그래프 설정 -->
+<div id="chart-settings">
+    {% for symbol in symbols %}
+        <label>
+            <input type="checkbox" name="symbol" value="{{ symbol }}">
+            {{ symbol }}
+        </label>
+    {% endfor %}
+    <button id="toggle-normalization">Normalize</button>
+    <button id="toggle-chart-type">Toggle Chart Type</button>
+</div>
 
-    $('#btn-month').click(function() {
-        getStockData('AAPL', 'month');
-    });
+<!-- 주식 그래프 -->
+<canvas id="stock-chart"></canvas>
 
-    function getStockData(symbol, interval) {
-        $.ajax({
-            url: '/api/stock/',
-            data: {
-                symbol: symbol,
-                interval: interval
-            },
-            success: function(data) {
-                let stockData = data['Time Series (Daily)'];
-                let labels = Object.keys(stockData).reverse();
-                let prices = labels.map(label => stockData[label]['4. close']);
+<!-- 종목 정보 표 -->
+<input type="text" id="search-input" placeholder="Search">
+<table id="stock-table">
+    <!-- Table Headers -->
+    <tr>
+        <th>Symbol</th>
+        <th>Current Price</th>
+        <th>Low</th>
+        <th>High</th>
+    </tr>
+    <!-- Table Data -->
+    <!-- 여기서는 Django를 사용해 동적으로 행을 생성합니다. -->
+    {% for stock in stocks %}
+        <tr>
+            <td>{{ stock.symbol }}</td>
+            <td>{{ stock.current_price }}</td>
+            <td>{{ stock.low }}</td>
+            <td>{{ stock.high }}</td>
+        </tr>
+    {% endfor %}
+</table>
 
-                drawChart(labels, prices);
-            }
-        });
-    }
-
-    function drawChart(labels, data) {
-        if (chart) {
-            chart.destroy();
-        }
-
-        let ctx = document.getElementById('stock-graph').getContext('2d');
-        chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Stock Price',
-                    data: data,
-                    backgroundColor: 'rgba(0, 123, 255, 0.5)',
-                    borderColor: 'rgba(0, 123, 255, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    xAxes: [{
-                        type: 'time',
-                        distribution: 'linear'
-                    }]
-                }
-            }
-        });
-    }
-</script>
+<script src="{% static 'js/stock.js' %}"></script>
 </body>
 </html>
