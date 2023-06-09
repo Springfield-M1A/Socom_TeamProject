@@ -5,7 +5,69 @@
     <title>Stock Information</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- 추가로 필요한 스크립트나 CSS를 로드합니다 -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .jumbotron {
+            background-image: url("https://images.unsplash.com/photo-1560221328-12fe60f83ab8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1474&q=80");
+            background-size: cover;
+            color: #fff;
+            padding: 250px 0;
+            margin-bottom: -20px;
+        }
+
+        .banner {
+            background-color: #f8f9fa;
+            padding: 10px;
+            font-size: 14px;
+            color: #777;
+        }
+
+        .banner a {
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+
+        .btn-primary {
+            padding: 80px;
+            font-size: 40px;
+            background-color: rgba(0,123,255,0);
+            color: rgba(255,255,255,0.4);
+            border: none;
+            transition: background-color 0.4s ease, color 0.01s ease;
+        }
+
+        .btn-primary:nth-child(1) {
+            background-color: rgba(40,167,69,0);
+        }
+
+        .btn-primary:nth-child(2) {
+            background-color: rgba(220,53,69,0);
+        }
+
+        .btn-primary:nth-child(3) {
+            background-color: rgba(0,123,255,0);
+        }
+
+        .btn-primary:hover {
+            background-color: rgba(0,0,0,0.3);
+            color: rgba(255,255,255,0.6);
+        }
+
+    </style>
 </head>
 <body>
 <!-- 종목 배너 -->
