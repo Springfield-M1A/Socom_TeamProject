@@ -62,16 +62,17 @@
         */
         async function submitQuestion() {
             var questionText = document.getElementById("question").value;
+            if(!questionText)alert('추천받을 서적의 종류를 질문해 주세요')
             questionText = `DESC::${questionText}`
             let response
             try{
              response = await chatGPT([
-                ['system',`The assistant's job is to recommend books that match the user's description. Responses like "title" - 'author'. reasonForRecommendation must be in Korean. Returns only the book's information. Remove pretext and posttext.`]
+                ['system',`The assistant's job is to recommend books that match the user's description. Responses like ["title - author"]. reasonForRecommendation must be in Korean. Returns only the book's information. Remove pretext and posttext.`]
                 ['user', 'DESC::주식 초보자를 위한 서적'],
-                ['assistant', '"주식추보자를 위한 경제 상식" - 워런버핏'],
+                ['assistant', '{"resonForRecommendation":"..","bookslist":["주식추보자를 위한 경제 상식 - 워런버핏"]}'],
                 ['user', '주식 투자 가이드를 위한 서적'],
-                ['assistant', '"주식 투자 가이드" - 존 J. 마틴'],
-                ['user', 'inputText'],
+                ['assistant', '{resonForRecommendation":"...","bookslist":["주식 투자 가이드 - 존 J. 마틴"]}'],
+                ['user', 'questionText'],
                 
             ])
         }catch(e){
@@ -80,7 +81,29 @@
         }
             var resultText = document.getElementById("result");
             console.log(respone)
-            resultText.innerText = response;
+            
+            const bookslist = response;
+            const bookslist = [
+                { title: "Atomic Habits", author: "James Clear" },
+                { title: "The Lean Startup", author: "Eric Ries" },
+                { title: "The 7 Habits of Highly Effective People", author: "Stephen Covey" }
+            ];
+
+            const resultText = document.querySelector("#result");
+
+            bookslist.forEach(book => {
+                const bookDiv = document.createElement("div");
+                const title = document.createElement("h3");
+                const author = document.createElement("p");
+                const reason = document.createElement("p");
+
+                title.textContent = book.title;
+                author.textContent = `by ${book.author}`;
+                reason.textContent = "I recommend this book because it provides practical advice for improving personal or business habits and achieving success.";
+
+                bookDiv.append(title, author, reason);
+                resultText.append(bookDiv);
+            });
         
         }
 
