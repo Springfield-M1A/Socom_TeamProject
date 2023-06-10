@@ -4,12 +4,19 @@ from sklearn import preprocessing
 import pandas as pd
 import requests
 import os
+import json
 import numpy as np
 
 def market_crawler(market):
     url = f"https://m.stock.naver.com/api/index/{market}/price?pageSize=30&page=1"
     response = requests.get(url)
-    data = response.json()
+
+    try:
+        data = response.json()
+    except json.JSONDecodeError:
+        print("No data to decode")
+        data = {}
+
     market_df = pd.DataFrame(data)
     market_df = market_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
     return market_df
@@ -17,7 +24,13 @@ def market_crawler(market):
 def code_crawler(code):
     url = f"https://m.stock.naver.com/api/stock/{code}/price?pageSize=30&page=1"
     response = requests.get(url)
-    data = response.json()
+
+    try:
+        data = response.json()
+    except json.JSONDecodeError:
+        print("No data to decode")
+        data = {}
+
     code_df = pd.DataFrame(data)
     code_df = code_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
     return code_df
@@ -91,6 +104,44 @@ def coefficient(market, code):
     return answer
 
 
+def predict_prices(df, model_name, days=5):
+    df = df[['localTradedAt', 'closePrice']]
+    df.columns = ['ds', 'y']
+    df['ds'] = pd.to_datetime(df['ds'])
+    df['y'] = df['y'].astype(float)
+
+    if model_name.lower() == 'arima':
+        model = ARIMA(df['y'], order=(5,1,0))
+        model_fit = model.fit(disp=0)
+        forecast, stderr, conf_int = model_fit.forecast(steps=days)
+    return forecast
+
+def prediction_trend(forecast):
+    trends = []
+    for i in range(1, len(forecast)):
+        if forecast[i] > forecast[i-1]:
+            trends.append('↗')
+        else:
+            trends.append('↘')
+    return trends
+
+def stock_prediction(market, code):
+    market_df = market_crawler(market)
+    code_df = code_crawler(code)
+
+    arima_forecast_market = predict_prices(market_df, 'arima')
+    arima_trends_market = prediction_trend(arima_forecast_market)
+
+    if (code != ''):
+        arima_forecast_code = predict_prices(code_df, 'arima')
+        arima_trends_code = prediction_trend(arima_forecast_code)
+
+    result = {
+        'arima_market': arima_trends_market,
+        'arima_code': arima_trends_code,
+    }
+
+    return result
 
 def prediction(request):
     market = 'KOSPI'
@@ -106,6 +157,7 @@ def prediction(request):
     # 여기에 그래프, 표, 예측 넣기
     graph=stock_graph(market, code, normalization)
     answer=coefficient(market, code)
+    stock_prediction_result = stock_prediction(market, code)
 
     html_response = f"""
     <div class="container">
@@ -129,6 +181,9 @@ def prediction(request):
         <div class="graph" style="width:400px height:300px">
         <img src="../static/images/graph.png" alt="그래프">
         <p> {answer} </p>
+        
+        <p>ARIMA 예측 (시장) : {' '.join(stock_prediction_result['arima_market'])}</p>
+        <p>ARIMA 예측 (종목) : {' '.join(stock_prediction_result['arima_code'])}</p>
     </div>
 
     """
