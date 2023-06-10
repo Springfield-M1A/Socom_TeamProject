@@ -16,29 +16,40 @@
         body {
             background-color: black;
             color: white;
+            font-size: 20px;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding:10px;
+            border: 1px solid greenyellow;
         }
     </style>
 </head>
 
 <body>
     <div>
-        <textarea id="question" rows="5" cols="50"></textarea>
+        <textarea id="question" rows="5" cols="50" placeholder="주식 초보자에게 추천해줄 서적 목록을 보여줘"></textarea>
     </div>
     <div>
         <button onclick="submitQuestion()">질문 요청</button>
     </div>
+
     <div id="result"></div>
+    
     <script>
         const chatGPT = async (messages, parameters = {}) => {
             //const apikey = 'API_KEY';
             if (messages[0].constructor === String) return await chatGPT([['user', messages[0]]]);
             messages = messages.map(line => ({ role: line[0], content: line[1].trim() }))
+            console.log(1)
             const response = await fetch('https://api.openai.com/v1/chat/completions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apikey}` },
                 body: JSON.stringify({ model: 'gpt-3.5-turbo', prompt: messages[messages.length - 1].content, ...parameters }),
             });
             const data = await response.json();
+            if (data?.error?.message) throw new Error(data.error.message);
             return data.choices[0].text.trim();
         };
         /*
@@ -51,19 +62,26 @@
         */
         async function submitQuestion() {
             var questionText = document.getElementById("question").value;
-            questionText = `주식 초보자들에게 추천해줄 서적`
-            const response = await chatGPT([
-                ['user', '호랑이'],
-                ['assistant', '어흥'],
-                ['user', '강아지'],
-                ['assistant', '멍멍'],
-                ['user', '닭'],
-                ['assistant', '꼬꼬댁'],
-                ['user', '고양이'],
+            questionText = `DESC::${questionText}`
+            let response
+            try{
+             response = await chatGPT([
+                ['system',`The assistant's job is to recommend books that match the user's description. Responses like "title" - 'author'. reasonForRecommendation must be in Korean. Returns only the book's information. Remove pretext and posttext.`]
+                ['user', 'DESC::주식 초보자를 위한 서적'],
+                ['assistant', '"주식추보자를 위한 경제 상식" - 워런버핏'],
+                ['user', '주식 투자 가이드를 위한 서적'],
+                ['assistant', '"주식 투자 가이드" - 존 J. 마틴'],
+                ['user', 'inputText'],
                 
             ])
+        }catch(e){
+            console.log(e.message)
+            return;
+        }
             var resultText = document.getElementById("result");
+            console.log(respone)
             resultText.innerText = response;
+        
         }
 
     </script>
