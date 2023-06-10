@@ -5,3 +5,5 @@ requests
 tradingview-ta~=3.3.0
 matplotlib
 flask
+sklearn
+scikit-learn

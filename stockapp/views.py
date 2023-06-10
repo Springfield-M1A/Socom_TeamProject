@@ -1,45 +1,65 @@
 import matplotlib.pyplot as plt
 from django.shortcuts import render, HttpResponse
+from sklearn import preprocessing
 import pandas as pd
 import requests
 import os
+import numpy as np
 
-market='KOSPI'
-
-
-
-def stock_crawler(market):
-    url = f"https://m.stock.naver.com/api/index/{market}/price?pageSize=50&page=1"
+def market_crawler(market):
+    url = f"https://m.stock.naver.com/api/index/{market}/price?pageSize=30&page=1"
     response = requests.get(url)
     data = response.json()
     market_df = pd.DataFrame(data)
     market_df = market_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
     return market_df
 
-def stock_crawler2(code):
-    url = f"https://finance.naver.com/item/sise.naver?code={code}"
-    requests = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'})
-    html=BeautifulSoup(requests.text, 'lxml')
-    code_df = pd.concat([df, pd.read_html(requests.text, encoding='euc-kr')[0]], ignore_index=True)
+def code_crawler(code):
+    url = f"https://m.stock.naver.com/api/stock/{code}/price?pageSize=30&page=1"
+    response = requests.get(url)
+    data = response.json()
+    code_df = pd.DataFrame(data)
+    code_df = code_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
+    return code_df
 
-    code_df.dropna(inplace=True)
-    code_df.reset_index(drop=True, inplace=True)
-
-def stock_graph(market):
-    market_df = stock_crawler(market)
+def stock_graph(market, code, normalization):
+    market_df = market_crawler(market)
     market_price = market_df['closePrice']
-
     market_price = market_price.str.replace(',', '').astype(float)
-    plt.figure(figsize=(5, 2.5))
 
-    x_market = market_df['localTradedAt']
-    x_market = x_market[::-1]
-    y_market = market_price.to_list()
+    if (code != ''):
+        code_df = code_crawler(code)
+        code_price = code_df['closePrice']
+        code_price = code_price.str.replace(',', '').astype(float)
+
+    plt.figure(figsize=(8, 4))
 
     ax = plt.gca()
     ax.axes.xaxis.set_visible(False)
 
-    plt.plot(x_market, y_market, label=market)
+
+    x_market = market_df['localTradedAt']
+    x_market = x_market[::-1]
+    y_market = market_price.to_list()
+    y_market_normalization = preprocessing.minmax_scale(y_market)
+
+    if (normalization == 'True'):
+        plt.plot(x_market, y_market_normalization, label=market)
+    else:
+        plt.plot(x_market, y_market, label=market)
+
+
+    if (code != ''):
+            x_code = code_df['localTradedAt']
+            x_code = x_code[::-1]
+            y_code = code_price.to_list()
+            y_code_normalization = preprocessing.minmax_scale(y_code)
+
+            if (normalization == 'True'):
+                plt.plot(x_code, y_code_normalization, label=code)
+            else:
+                plt.plot(x_code, y_code, label=code)
+
     plt.legend(loc=0)
 
     static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
@@ -47,18 +67,45 @@ def stock_graph(market):
 
     plt.savefig(image_path)
 
+def coefficient(market, code):
+    market_df = market_crawler(market)
+    market_price = market_df['closePrice']
+    market_price = market_price.str.replace(',', '').astype(float)
+
+    if (code != ''):
+        code_df = code_crawler(code)
+        code_price = code_df['closePrice']
+        code_price = code_price.str.replace(',', '').astype(float)
+        y_code = code_price.to_list()
+        y_code_normalization = preprocessing.minmax_scale(y_code)
+
+    y_market = market_price.to_list()
+    y_market_normalization = preprocessing.minmax_scale(y_market)
+
+    if (code != ''):
+        coef = np.corrcoef(y_market_normalization, y_code_normalization)[0, 1]*100
+        answer = f"{market}와 {code} 의 상관계수는 {coef:.2f}% 입니다."
+    else:
+        answer = f"{code} 종목이 없어 {market} 와의 상관계수를 계산할 수 없습니다."
+
+    return answer
 
 
 
 def prediction(request):
     market = 'KOSPI'
+    code = ''
+    normalization = 'False'
 
     if request.GET:
         market = request.GET.get('market', market)
+        code = request.GET.get('code', code)
+        normalization = request.GET.get('normalization', normalization)
+
 
     # 여기에 그래프, 표, 예측 넣기
-    graph=stock_graph(market)
-
+    graph=stock_graph(market, code, normalization)
+    answer=coefficient(market, code)
 
     html_response = f"""
     <div class="container">
@@ -69,14 +116,19 @@ def prediction(request):
                 <option value="KOSPI">KOSPI</option>
                 <option value="KOSDAQ">KOSDAQ</option>
             </select>
-            
             <input type="text" name="code" placeholder="종목코드">
+            <select name="normalization">
+                <option value="False">기본</option>
+                <option value="True">정규화</option>
+            </select>
+            
             <input type="submit" value="조회">
         </form>
         </div>
         
         <div class="graph" style="width:400px height:300px">
         <img src="../static/images/graph.png" alt="그래프">
+        <p> {answer} </p>
     </div>
 
     """
