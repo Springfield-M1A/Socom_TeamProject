@@ -4,13 +4,13 @@ import pandas as pd
 import requests
 import os
 
-def stock_crawler(stock):
-    url = f"https://m.stock.naver.com/api/index/{stock}/price?pageSize=30&page=1"
+def market_crawler(market):
+    url = f"https://m.stock.naver.com/api/index/{market}/price?pageSize=30&page=1"
     response = requests.get(url)
     data = response.json()
-    stock_df = pd.DataFrame(data)
-    stock_df = stock_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
-    return stock_df
+    market_df = pd.DataFrame(data)
+    market_df = market_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
+    return market_df
 
 def code_crawler(code):
     url = f"https://m.stock.naver.com/api/stock/{code}/price?pageSize=30&page=1"
@@ -20,26 +20,33 @@ def code_crawler(code):
     code_df = code_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
     return code_df
 
-def stock_graph(kospi, kosdaq, page):
-    stock_df = stock_crawler(kospi,page)
-    stock_price = stock_df['closePrice']
+def stock_graph(market, code):
+    market_df = market_crawler(kospi)
+    market_price = market_df['closePrice']
 
     code_df = code_crawler(kosdaq,page)
     code_price = code_df['closePrice']
 
-    stock_price = stock_price.str.replace(',', '').astype(float)
+    market_price = market_price.str.replace(',', '').astype(float)
     code_price = code_price.str.replace(',', '').astype(float)
 
     plt.figure(figsize=(5, 2.5))
 
-    x_market = kospi_df['localTradedAt']
+    x_market = market_df['localTradedAt']
     x_market = x_market[::-1]
     y_market = market_price.to_list()
+
+    x_code = code_df['localTradedAt']
+    x_code = x_code[::-1]
+    y_code = code_price.to_list()
+
 
     ax = plt.gca()
     ax.axes.xaxis.set_visible(False)
 
     plt.plot(x_market, y_market, label=market)
+
+    plt.plot(x_code, y_code, label=code)
     plt.legend(loc=0)
 
     static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
@@ -65,7 +72,7 @@ def prediction(request):
         <a href="https://www.ktb.co.kr/trading/popup/itemPop.jspx" target="_blank"><img src="../static/images/Code.png" alt="코드 종목 조회"></a>
         <p></p>
         <form action="">
-            <select name="market">
+            <select name="stock">
                 <option value="KOSPI">KOSPI</option>
                 <option value="KOSDAQ">KOSDAQ</option>
             </select>
