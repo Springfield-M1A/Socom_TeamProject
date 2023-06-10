@@ -6,6 +6,8 @@ import requests
 import os
 import json
 import numpy as np
+from statsmodels.tsa.arima.model import ARIMA
+
 
 def market_crawler(market):
     url = f"https://m.stock.naver.com/api/index/{market}/price?pageSize=30&page=1"
@@ -104,19 +106,31 @@ def coefficient(market, code):
     return answer
 
 
-def predict_prices(df, model_name, days=5):
-    df = df[['localTradedAt', 'closePrice']]
-    df.columns = ['ds', 'y']
-    df['ds'] = pd.to_datetime(df['ds'])
-    df['y'] = df['y'].astype(float)
+def stock_predict_prices(market, code, days=5):
+    market_df = market_crawler(market)
+    market_price= market_df['closePrice']
+    market_price = market_price.str.replace(',', '').astype(float)
 
-    if model_name.lower() == 'arima':
-        model = ARIMA(df['y'], order=(5,1,0))
-        model_fit = model.fit(disp=0)
-        forecast, stderr, conf_int = model_fit.forecast(steps=days)
-    return forecast
+    market_model = ARIMA(market_price, order=(5, 1, 0))
+    market_model_fit = market_model.fit()
+    market_forecast = market_model_fit.forecast(steps=days)[0]
 
-def prediction_trend(forecast):
+
+    if code != '':
+        code_df = code_crawler(code)
+        code_price = code_df['closePrice']
+        code_price = code_price.str.replace(',', '').astype(float)
+        code_model = ARIMA(code_price, order=(5, 1, 0))
+        code_model_fit = code_model.fit()
+        code_forecast = code_model_fit.forecast(steps=days)[0]
+
+    result = {
+        'market': market_forecast.tolist(),
+        'code': code_forecast.tolist()
+    }
+
+
+def stock_prediction_trend(forecast):
     trends = []
     for i in range(1, len(forecast)):
         if forecast[i] > forecast[i-1]:
@@ -125,20 +139,31 @@ def prediction_trend(forecast):
             trends.append('↘')
     return trends
 
+
+def stock_prediction(market, code):
+
+
 def stock_prediction(market, code):
     market_df = market_crawler(market)
-    code_df = code_crawler(code)
+
+    if code != '':
+        code_df = code_crawler(code)
 
     arima_forecast_market = predict_prices(market_df, 'arima')
     arima_trends_market = prediction_trend(arima_forecast_market)
 
-    if (code != ''):
+    if code != '':
         arima_forecast_code = predict_prices(code_df, 'arima')
         arima_trends_code = prediction_trend(arima_forecast_code)
+    else:
+        arima_forecast_code = []
+        arima_trends_code = []
 
     result = {
         'arima_market': arima_trends_market,
+        'arima_market_prices': arima_forecast_market,
         'arima_code': arima_trends_code,
+        'arima_code_prices': arima_forecast_code
     }
 
     return result
@@ -182,8 +207,6 @@ def prediction(request):
         <img src="../static/images/graph.png" alt="그래프">
         <p> {answer} </p>
         
-        <p>ARIMA 예측 (시장) : {' '.join(stock_prediction_result['arima_market'])}</p>
-        <p>ARIMA 예측 (종목) : {' '.join(stock_prediction_result['arima_code'])}</p>
     </div>
 
     """
