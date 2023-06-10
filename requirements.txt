@@ -7,3 +7,5 @@ matplotlib
 flask
 sklearn
 scikit-learn
+statsmodels
+pmdarima
