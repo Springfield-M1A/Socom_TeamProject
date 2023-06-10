@@ -4,6 +4,7 @@ from sklearn import preprocessing
 import pandas as pd
 import requests
 import os
+import numpy as np
 
 def market_crawler(market):
     url = f"https://m.stock.naver.com/api/index/{market}/price?pageSize=30&page=1"
@@ -31,9 +32,7 @@ def stock_graph(market, code, normalization):
         code_price = code_df['closePrice']
         code_price = code_price.str.replace(',', '').astype(float)
 
-
-
-    plt.figure(figsize=(5, 2.5))
+    plt.figure(figsize=(8, 4))
 
     ax = plt.gca()
     ax.axes.xaxis.set_visible(False)
@@ -68,20 +67,45 @@ def stock_graph(market, code, normalization):
 
     plt.savefig(image_path)
 
+def coefficient(market, code):
+    market_df = market_crawler(market)
+    market_price = market_df['closePrice']
+    market_price = market_price.str.replace(',', '').astype(float)
+
+    if (code != ''):
+        code_df = code_crawler(code)
+        code_price = code_df['closePrice']
+        code_price = code_price.str.replace(',', '').astype(float)
+        y_code = code_price.to_list()
+        y_code_normalization = preprocessing.minmax_scale(y_code)
+
+    y_market = market_price.to_list()
+    y_market_normalization = preprocessing.minmax_scale(y_market)
+
+    if (code != ''):
+        coef = np.corrcoef(y_market_normalization, y_code_normalization)[0, 1]*100
+        answer = f"{market}와 {code} 의 상관계수는 {coef:.2f}% 입니다."
+    else:
+        answer = f"{code} 종목이 없어 {market} 와의 상관계수를 계산할 수 없습니다."
+
+    return answer
 
 
 
 def prediction(request):
     market = 'KOSPI'
     code = ''
+    normalization = 'False'
 
     if request.GET:
         market = request.GET.get('market', market)
         code = request.GET.get('code', code)
+        normalization = request.GET.get('normalization', normalization)
+
 
     # 여기에 그래프, 표, 예측 넣기
     graph=stock_graph(market, code, normalization)
-
+    answer=coefficient(market, code)
 
     html_response = f"""
     <div class="container">
@@ -104,6 +128,7 @@ def prediction(request):
         
         <div class="graph" style="width:400px height:300px">
         <img src="../static/images/graph.png" alt="그래프">
+        <p> {answer} </p>
     </div>
 
     """
