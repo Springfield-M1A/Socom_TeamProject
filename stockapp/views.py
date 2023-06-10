@@ -4,12 +4,22 @@ from sklearn import preprocessing
 import pandas as pd
 import requests
 import os
+import json
 import numpy as np
+import pmdarima as pm
+from statsmodels.tsa.arima.model import ARIMA
 
+market_predict_list = []
 def market_crawler(market):
     url = f"https://m.stock.naver.com/api/index/{market}/price?pageSize=30&page=1"
     response = requests.get(url)
-    data = response.json()
+
+    try:
+        data = response.json()
+    except json.JSONDecodeError:
+        print("No data to decode")
+        data = {}
+
     market_df = pd.DataFrame(data)
     market_df = market_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
     return market_df
@@ -17,7 +27,13 @@ def market_crawler(market):
 def code_crawler(code):
     url = f"https://m.stock.naver.com/api/stock/{code}/price?pageSize=30&page=1"
     response = requests.get(url)
-    data = response.json()
+
+    try:
+        data = response.json()
+    except json.JSONDecodeError:
+        print("No data to decode")
+        data = {}
+
     code_df = pd.DataFrame(data)
     code_df = code_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
     return code_df
@@ -90,7 +106,38 @@ def coefficient(market, code):
 
     return answer
 
+def market_price_predict(market):
+    market_df = market_crawler(market)
+    market_price = market_df['closePrice']
+    market_price = market_price.str.replace(',', '').astype(float)
 
+    train_data = market_price[:-5]
+
+    # ARIMA 모델 학습
+    model = pm.auto_arima(train_data, seasonal=False, suppress_warnings=True)
+    model.fit(train_data)
+
+    # 5일 예측
+    market_predict = model.predict(n_periods=5)
+
+    return market_predict
+
+def code_price_predict(code):
+    if (code!=''):
+        code_df = code_crawler(code)
+        code_price = code_df['closePrice']
+        code_price = code_price.str.replace(',', '').astype(float)
+
+        train_data = code_price[:-5]
+
+        model = pm.auto_arima(train_data, seasonal=False, suppress_warnings=True)
+        model.fit(train_data)
+
+        code_predict = model.predict(n_periods=5)
+    else:
+        code_predict = ['?', '?', '?', '?', '?']
+
+    return code_predict
 
 def prediction(request):
     market = 'KOSPI'
@@ -106,6 +153,8 @@ def prediction(request):
     # 여기에 그래프, 표, 예측 넣기
     graph=stock_graph(market, code, normalization)
     answer=coefficient(market, code)
+
+
 
     html_response = f"""
     <div class="container">
@@ -129,6 +178,9 @@ def prediction(request):
         <div class="graph" style="width:400px height:300px">
         <img src="../static/images/graph.png" alt="그래프">
         <p> {answer} </p>
+        
+        <p> {market} 예측 : {market_price_predict(market)} </p>
+        <p> {code} 예측 : {code_price_predict(code)} </p>
     </div>
 
     """
