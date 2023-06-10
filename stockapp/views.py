@@ -4,30 +4,35 @@ import pandas as pd
 import requests
 import os
 
-def kospi_crawler():
-    url = f"https://m.stock.naver.com/api/index/{market}/price?pageSize=50&page=1"
+def stock_crawler(stock):
+    url = f"https://m.stock.naver.com/api/index/{stock}/price?pageSize=30&page=1"
     response = requests.get(url)
     data = response.json()
-    kospi_df = pd.DataFrame(data)
-    kospi_df = kospi_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
-    return kospi_df
+    stock_df = pd.DataFrame(data)
+    stock_df = stock_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
+    return stock_df
 
-def kosdaq_crawler():
-    url = f"https://m.stock.naver.com/api/index/{market}/price?pageSize=50&page=1"
+def code_crawler(code):
+    url = f"https://m.stock.naver.com/api/stock/{code}/price?pageSize=30&page=1"
     response = requests.get(url)
     data = response.json()
-    kosdaq_df = pd.DataFrame(data)
-    kosdaq_df = kosdaq_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
-    return kosdaq_df
+    code_df = pd.DataFrame(data)
+    code_df = code_df[['localTradedAt', 'closePrice', 'compareToPreviousClosePrice', 'openPrice', 'highPrice', 'lowPrice']]
+    return code_df
 
-def stock_graph(market):
-    market_df = stock_crawler(market)
-    market_price = market_df['closePrice']
+def stock_graph(kospi, kosdaq, page):
+    stock_df = stock_crawler(kospi,page)
+    stock_price = stock_df['closePrice']
 
-    market_price = market_price.str.replace(',', '').astype(float)
+    code_df = code_crawler(kosdaq,page)
+    code_price = code_df['closePrice']
+
+    stock_price = stock_price.str.replace(',', '').astype(float)
+    code_price = code_price.str.replace(',', '').astype(float)
+
     plt.figure(figsize=(5, 2.5))
 
-    x_market = market_df['localTradedAt']
+    x_market = kospi_df['localTradedAt']
     x_market = x_market[::-1]
     y_market = market_price.to_list()
 
