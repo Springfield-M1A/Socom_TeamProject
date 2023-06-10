@@ -8,7 +8,7 @@ import json
 import numpy as np
 from statsmodels.tsa.arima.model import ARIMA
 
-
+market_predict_list = []
 def market_crawler(market):
     url = f"https://m.stock.naver.com/api/index/{market}/price?pageSize=30&page=1"
     response = requests.get(url)
@@ -105,68 +105,14 @@ def coefficient(market, code):
 
     return answer
 
-
-def stock_predict_prices(market, code, days=5):
+def market_price_predict(market):
     market_df = market_crawler(market)
-    market_price= market_df['closePrice']
+    market_price = market_df['closePrice']
     market_price = market_price.str.replace(',', '').astype(float)
 
-    market_model = ARIMA(market_price, order=(5, 1, 0))
-    market_model_fit = market_model.fit()
-    market_forecast = market_model_fit.forecast(steps=days)[0]
-
-
-    if code != '':
-        code_df = code_crawler(code)
-        code_price = code_df['closePrice']
-        code_price = code_price.str.replace(',', '').astype(float)
-        code_model = ARIMA(code_price, order=(5, 1, 0))
-        code_model_fit = code_model.fit()
-        code_forecast = code_model_fit.forecast(steps=days)[0]
-
-    result = {
-        'market': market_forecast.tolist(),
-        'code': code_forecast.tolist()
-    }
-
-
-def stock_prediction_trend(forecast):
-    trends = []
-    for i in range(1, len(forecast)):
-        if forecast[i] > forecast[i-1]:
-            trends.append('↗')
-        else:
-            trends.append('↘')
-    return trends
-
-
-def stock_prediction(market, code):
-
-
-def stock_prediction(market, code):
-    market_df = market_crawler(market)
-
-    if code != '':
-        code_df = code_crawler(code)
-
-    arima_forecast_market = predict_prices(market_df, 'arima')
-    arima_trends_market = prediction_trend(arima_forecast_market)
-
-    if code != '':
-        arima_forecast_code = predict_prices(code_df, 'arima')
-        arima_trends_code = prediction_trend(arima_forecast_code)
-    else:
-        arima_forecast_code = []
-        arima_trends_code = []
-
-    result = {
-        'arima_market': arima_trends_market,
-        'arima_market_prices': arima_forecast_market,
-        'arima_code': arima_trends_code,
-        'arima_code_prices': arima_forecast_code
-    }
-
-    return result
+    model = ARIMA(market_price, order=(1, 1, 1))
+    model_fit = model.fit()
+    market_predict = model_fit.forecast(steps=5)
 
 def prediction(request):
     market = 'KOSPI'
@@ -182,7 +128,7 @@ def prediction(request):
     # 여기에 그래프, 표, 예측 넣기
     graph=stock_graph(market, code, normalization)
     answer=coefficient(market, code)
-    stock_prediction_result = stock_prediction(market, code)
+    market_predict_list=market_price_predict(market)
 
     html_response = f"""
     <div class="container">
@@ -206,6 +152,8 @@ def prediction(request):
         <div class="graph" style="width:400px height:300px">
         <img src="../static/images/graph.png" alt="그래프">
         <p> {answer} </p>
+        
+        
         
     </div>
 
