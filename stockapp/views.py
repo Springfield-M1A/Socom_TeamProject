@@ -6,6 +6,7 @@ import requests
 import os
 import json
 import numpy as np
+import pmdarima as pm
 from statsmodels.tsa.arima.model import ARIMA
 
 market_predict_list = []
@@ -110,9 +111,33 @@ def market_price_predict(market):
     market_price = market_df['closePrice']
     market_price = market_price.str.replace(',', '').astype(float)
 
-    model = ARIMA(market_price, order=(1, 1, 1))
-    model_fit = model.fit()
-    market_predict = model_fit.forecast(steps=5)
+    train_data = market_price[:-5]
+
+    # ARIMA 모델 학습
+    model = pm.auto_arima(train_data, seasonal=False, suppress_warnings=True)
+    model.fit(train_data)
+
+    # 5일 예측
+    market_predict = model.predict(n_periods=5)
+
+    return market_predict
+
+def code_price_predict(code):
+    if (code!=''):
+        code_df = code_crawler(code)
+        code_price = code_df['closePrice']
+        code_price = code_price.str.replace(',', '').astype(float)
+
+        train_data = code_price[:-5]
+
+        model = pm.auto_arima(train_data, seasonal=False, suppress_warnings=True)
+        model.fit(train_data)
+
+        code_predict = model.predict(n_periods=5)
+    else:
+        code_predict = ['?', '?', '?', '?', '?']
+
+    return code_predict
 
 def prediction(request):
     market = 'KOSPI'
@@ -128,7 +153,8 @@ def prediction(request):
     # 여기에 그래프, 표, 예측 넣기
     graph=stock_graph(market, code, normalization)
     answer=coefficient(market, code)
-    market_predict_list=market_price_predict(market)
+
+
 
     html_response = f"""
     <div class="container">
@@ -153,8 +179,8 @@ def prediction(request):
         <img src="../static/images/graph.png" alt="그래프">
         <p> {answer} </p>
         
-        
-        
+        <p> {market} 예측 : {market_price_predict(market)} </p>
+        <p> {code} 예측 : {code_price_predict(code)} </p>
     </div>
 
     """

@@ -8,3 +8,4 @@ flask
 sklearn
 scikit-learn
 statsmodels
+pmdarima
