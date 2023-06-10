@@ -1,137 +1,84 @@
 <!DOCTYPE html>
-<html>
+
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css">
 
-        .chart-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-
-        .chart {
-            width: 300px;
-            height: 200px;
-            margin: 10px;
-            border: 1px solid #ddd;
-            padding: 10px;
-        }
-
-        .graph-container {
-            margin-top: 30px;
-        }
-
-        .graph-select {
-            margin-bottom: 10px;
-        }
-
-        .graph {
-            width: 100%;
-            height: 400px;
-        }
-    </style>
 </head>
+
 <body>
-<div class="container">
-    <h1>Stock Information</h1>
-
-    <div class="chart-container">
-        <!-- 상위 차트 몇 개를 반복하여 보여줌 -->
-        {% for chart_data in top_charts %}
-            <div class="chart">
-                <h4>{{ chart_data.title }}</h4>
-                <!-- 차트 데이터를 표시 -->
-                <p>{{ chart_data.data }}</p>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1>Stock</h1>
             </div>
-        {% endfor %}
-    </div>
-
-    <div class="graph-container">
-        <h3>Price History Graph</h3>
-
-        <!-- 기간 선택을 위한 버튼 -->
-        <div class="graph-select">
-            <button class="btn btn-primary" id="btn-day">1 Day</button>
-            <button class="btn btn-primary" id="btn-week">1 Week</button>
-            <button class="btn btn-primary" id="btn-month">1 Month</button>
-            <button class="btn btn-primary" id="btn-3months">3 Months</button>
-            <button class="btn btn-primary" id="btn-year">1 Year</button>
-            <button class="btn btn-primary" id="btn-5years">5 Years</button>
-            <button class="btn btn-primary" id="btn-all">All</button>
         </div>
-
-        <!-- 선택한 종목의 그래프 -->
-        <canvas id="stock-graph" class="graph"></canvas>
+    <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+            {
+                "symbols": [
+                {
+                    "proName": "FOREXCOM:SPXUSD",
+                    "title": "S&P 500"
+                },
+                {
+                    "proName": "FOREXCOM:NSXUSD",
+                    "title": "US 100"
+                },
+                {
+                    "proName": "FX_IDC:EURUSD",
+                    "title": "EUR/USD"
+                },
+                {
+                    "proName": "BITSTAMP:BTCUSD",
+                    "title": "비트코인"
+                },
+                {
+                    "proName": "BITSTAMP:ETHUSD",
+                    "title": "이더리움"
+                }
+            ],
+                "showSymbolLogo": true,
+                "colorTheme": "light",
+                "isTransparent": false,
+                "displayMode": "adaptive",
+                "locale": "kr"
+            }
+        </script>
     </div>
+    <!-- TradingView Widget END -->
+
+
+<!-- TradingView Widget BEGIN -->
+<div class="tradingview-widget-container">
+    <div id="tradingview_7de2e"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script type="text/javascript">
+        new TradingView.widget(
+            {
+                "width": 1000,
+                "height": 610,
+                "symbol": "NASDAQ:AAPL",
+                "interval": "D",
+                "timezone": "Etc/UTC",
+                "theme": "light",
+                "style": "1",
+                "locale": "kr",
+                "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false,
+                "allow_symbol_change": true,
+                "container_id": "tradingview_7de2e"
+            }
+        );
+    </script>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    let chart;
-    $('#btn-day').click(function() {
-        getStockData('AAPL', 'day');
-    });
 
-    $('#btn-month').click(function() {
-        getStockData('AAPL', 'month');
-    });
-
-    function getStockData(symbol, interval) {
-        $.ajax({
-            url: '/api/stock/',
-            data: {
-                symbol: symbol,
-                interval: interval
-            },
-            success: function(data) {
-                let stockData = data['Time Series (Daily)'];
-                let labels = Object.keys(stockData).reverse();
-                let prices = labels.map(label => stockData[label]['4. close']);
-
-                drawChart(labels, prices);
-            }
-        });
-    }
-
-    function drawChart(labels, data) {
-        if (chart) {
-            chart.destroy();
-        }
-
-        let ctx = document.getElementById('stock-graph').getContext('2d');
-        chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Stock Price',
-                    data: data,
-                    backgroundColor: 'rgba(0, 123, 255, 0.5)',
-                    borderColor: 'rgba(0, 123, 255, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    xAxes: [{
-                        type: 'time',
-                        distribution: 'linear'
-                    }]
-                }
-            }
-        });
-    }
-</script>
+<!-- TradingView Widget END -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
