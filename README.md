@@ -40,7 +40,7 @@
 - Other Libraries are listed in requirements.txt
 ---
 # How to use
-![img](./info1.png)
+![img](./Info1.png)
 1. KOSPI / KOSDAQ Info and Graph will be shown
 2. If you put stock code in it, you can see the stock info and graph with it
 3. Normalization is also provided
