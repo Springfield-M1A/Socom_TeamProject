@@ -66,22 +66,20 @@
             let response
             try{
              response = await chatGPT([
-               /* ['user', '호랑이'],
-                ['assistant', '어흥'],
-                ['user', '강아지'],
-                ['assistant', '멍멍'],
-                ['user', '닭'],
-                ['assistant', '꼬꼬댁'],
-                ['user', '고양이'],
-                */
+                ['system',`The assistant's job is to recommend books that match the user's description. Responses like "title" - 'author'. reasonForRecommendation must be in Korean. Returns only the book's information. Remove pretext and posttext.`]
+                ['user', 'DESC::주식 초보자를 위한 서적'],
+                ['assistant', '"주식추보자를 위한 경제 상식" - 워런버핏'],
+                ['user', '주식 투자 가이드를 위한 서적'],
+                ['assistant', '"주식 투자 가이드" - 존 J. 마틴'],
+                ['user', 'inputText'],
+                
             ])
         }catch(e){
             console.log(e.message)
             return;
         }
             var resultText = document.getElementById("result");
-            console.log(e.message)
-            
+            console.log(respone)
             resultText.innerText = response;
         
         }
