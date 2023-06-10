@@ -180,10 +180,14 @@ def prediction(request):
         <p> {answer} </p>
         
         <p> {market} 예측 : {market_price_predict(market)} </p>
-        <p> {code} 예측 : {code_price_predict(code)} </p>
     </div>
 
     """
+
+    if (code != ''):
+        html_response = html_response + f"""
+        <p> {code} 예측 : {code_price_predict(code)} </p>
+        """
 
     return HttpResponse(html_response)
 
